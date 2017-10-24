@@ -8,6 +8,8 @@ package in.spiph.tracker;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -16,6 +18,17 @@ import java.net.Socket;
 public class Application {
 
     static int serverListenerSocket = 4198;
+    static final Map<Long, String> IPMAP = new HashMap();
+    static final Map<Long, Long> PKEYMAP = new HashMap();
+
+    static {
+        IPMAP.put(1234L, "1.2.3.4");
+        IPMAP.put(2222L, "2.2.2.2");
+        IPMAP.put(666L, "6.6.6.6");
+        PKEYMAP.put(1234L, 12L);
+        PKEYMAP.put(2222L, 22L);
+        PKEYMAP.put(666L, 66L);
+    }
 
     /**
      * @param args the command line arguments

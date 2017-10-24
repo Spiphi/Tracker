@@ -14,8 +14,6 @@ import in.spiph.packets.iplookup.IpLookupPacket;
 import in.spiph.packets.iplookup.IpLookupResponsePacket;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -24,14 +22,7 @@ import java.util.Map;
 public class TrackerThread implements Runnable {
 
     private final Socket socket;
-    private static final Map<Long, String> IPMAP = new HashMap<>();
-    private IPacketManager man;
-
-    static {
-        IPMAP.put(1234L, "1.2.3.4");
-        IPMAP.put(2222L, "2.2.2.2");
-        IPMAP.put(666L, "6.6.6.6");
-    }
+    private IPacketManager pman;
 
     public TrackerThread(Socket socket) {
         this.socket = socket;
@@ -40,29 +31,29 @@ public class TrackerThread implements Runnable {
     @Override
     public void run() {
         try {
-            man = new BufferedManager(this.socket);
+            pman = new BufferedManager(this.socket);
             APacket packet;
-            while ((packet = man.readPacket()) != null) {
+            while ((packet = pman.readPacket()) != null) {
                 APacket outPacket = handlePacket(packet);
-                man.sendPacket(outPacket);
+                pman.sendPacket(outPacket);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
-            man.close();
+            pman.close();
         }
     }
 
     private void updateIdToIP(long id, String ip) {
-        IPMAP.put(id, ip);
+        Application.IPMAP.put(id, ip);
     }
 
     private String getIpFromId(long id) {
-        String resp = IPMAP.get(id);
-        if (resp == null) {
-            resp = "0.0.0.0";
-        }
-        return resp;
+        return Application.IPMAP.getOrDefault(id, "0.0.0.0");
+    }
+    
+    private Long getPKeyFromId(long id) {
+        return Application.PKEYMAP.getOrDefault(id, -1L);
     }
 
     private APacket handlePacket(APacket packet) {
